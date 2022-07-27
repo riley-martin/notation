@@ -10,5 +10,5 @@ repository on github).
 
 ##License
 This program in license under the GPL3
-See LICENSE.txt for details
+See [LICENSE](./LICENSE) for details
 
