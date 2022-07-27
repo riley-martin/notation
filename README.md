@@ -1,14 +1,12 @@
 # Notation
 ## A simple cli note-taking program written in rust
 Notation is a simple cli note-taking program written in rust 
-(after all: "everything is better in rust":). It can synchronize notes across
-devices by setting it up to push notes to a git repository (for example, a private
-repository on github).
+(after all: "everything is better in rust":).
 
 ## Installation and usage
 **TODO**
 
 ## License
-This program in license under the GPL3
+This program is licensed under the GPLv3
 See [LICENSE](./LICENSE) for details
 

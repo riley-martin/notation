@@ -40,7 +40,7 @@ fn main() {
             note_file
                 .write_all(
                     format!(
-                        "#{}\n",
+                        "# {}\n",
                         subcmd_matches.get_one::<String>("title").expect("no title")
                     )
                     .as_bytes(),
