@@ -62,7 +62,7 @@ fn main() {
 }
 
 fn new_note(time: DateTime<Local>) -> Result<fs::File, std::io::Error> {
-    let pathfmt = format!("{}", time.format("%Y/%m/%d/%H.%M.md"));
+    let pathfmt = format!("{}", time.format("notes/%Y/%m/%d/%H.%M.md"));
     let path = path::Path::new(&pathfmt);
     let prefix = path.parent().unwrap();
     fs::create_dir_all(prefix).unwrap();
