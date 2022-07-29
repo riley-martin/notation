@@ -33,31 +33,36 @@ fn main() {
         )
         .get_matches();
     let local_time: DateTime<Local> = Local::now();
-    if app.subcommand_name() == Some("new") {
-        let mut note_file = new_note(local_time).expect("Couldn't create note");
-        let subcmd_matches = app.subcommand().unwrap().1;
-        if subcmd_matches.contains_id("title") {
-            note_file
-                .write_all(
-                    format!(
-                        "# {}\n",
-                        subcmd_matches.get_one::<String>("title").expect("no title")
-                    )
-                    .as_bytes(),
-                )
-                .expect("Couldn't write file");
-            if subcmd_matches.contains_id("body") {
+    match app.subcommand_name() {
+        Some("new") => {
+            let mut note_file = new_note(local_time).expect("Couldn't create note");
+            let subcmd_matches = app.subcommand().unwrap().1;
+            if subcmd_matches.contains_id("title") {
                 note_file
                     .write_all(
                         format!(
-                            "{}\n",
-                            subcmd_matches.get_one::<String>("body").expect("no body")
+                            "# {}\n",
+                            subcmd_matches.get_one::<String>("title").expect("no title")
                         )
                         .as_bytes(),
                     )
                     .expect("Couldn't write file");
+                if subcmd_matches.contains_id("body") {
+                    note_file
+                        .write_all(
+                            format!(
+                                "{}\n",
+                                subcmd_matches.get_one::<String>("body").expect("no body")
+                            )
+                            .as_bytes(),
+                        )
+                        .expect("Couldn't write file");
+                }
             }
-        }
+        },
+        Some("edit") => {},
+        Some("delete") => {},
+        _ => {},
     }
 }
 
