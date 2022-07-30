@@ -15,6 +15,7 @@ Install using git and cargo
 - [x] Edit existing notes
 - [x] Delete old notes
 - [ ] Select notes by title (currently uses file path, sort of clunky)
+- [ ] More of a TUI rather than just using subcommands (especially for selecting notes)
 
 ## License
 This program is licensed under the GPLv3.
