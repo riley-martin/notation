@@ -32,9 +32,11 @@ fn main() {
                 .help("which editor to use (uses $EDITOR by default)"),
         )
         .get_matches();
-    let local_time: DateTime<Local> = Local::now();
+
+
     match app.subcommand_name() {
         Some("new") => {
+            let local_time: DateTime<Local> = Local::now();
             let mut note_file = new_note(local_time).expect("Couldn't create note");
             let subcmd_matches = app.subcommand().unwrap().1;
             if subcmd_matches.contains_id("title") {
@@ -61,8 +63,16 @@ fn main() {
             }
         },
         Some("edit") => {},
-        Some("delete") => {},
-        _ => {},
+        Some("delete") => {
+            let subcmd_matches = app.subcommand().unwrap().1;
+            if subcmd_matches.contains_id("note") {
+                rm_note(
+                    subcmd_matches.get_one::<String>("note")
+                    .expect("What note shall I delete?").to_string()
+                ).expect("Couldn't delete file");
+            }
+        },
+        _ => {println!("Unrecognized command")},
     }
 }
 
@@ -80,4 +90,9 @@ fn new_note(time: DateTime<Local>) -> Result<fs::File, std::io::Error> {
         Ok(fs::File::create(&path)?)
     };
     return result;
+}
+
+fn rm_note(loc: String) -> Result<(), std::io::Error> {
+    fs::remove_file(loc)?;
+    Ok(())
 }
