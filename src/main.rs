@@ -33,7 +33,6 @@ fn main() {
         )
         .get_matches();
 
-
     match app.subcommand_name() {
         Some("new") => {
             let local_time: DateTime<Local> = Local::now();
@@ -61,29 +60,38 @@ fn main() {
                         .expect("Couldn't write file");
                 }
             }
-        },
+        }
         Some("edit") => {
             let subcmd_matches = app.subcommand().unwrap().1;
             let editor = std::env::var("EDITOR").expect("Set $EDITOR to a valid value");
             println!("{}", editor);
             let mut child = std::process::Command::new(editor)
                 .arg(if subcmd_matches.contains_id("note") {
-                        subcmd_matches.get_one::<String>("note")
+                    subcmd_matches
+                        .get_one::<String>("note")
                         .expect("What note shall I edit")
-                    } else {""})
-                .spawn().expect("Couln't execute $EDITOR");
+                } else {
+                    ""
+                })
+                .spawn()
+                .expect("Couln't execute $EDITOR");
             child.wait().expect("Failed to wait for editor");
-        },
+        }
         Some("delete") => {
             let subcmd_matches = app.subcommand().unwrap().1;
             if subcmd_matches.contains_id("note") {
                 rm_note(
-                    subcmd_matches.get_one::<String>("note")
-                    .expect("What note shall I delete?").to_string()
-                ).expect("Couldn't delete file");
+                    subcmd_matches
+                        .get_one::<String>("note")
+                        .expect("What note shall I delete?")
+                        .to_string(),
+                )
+                .expect("Couldn't delete file");
             }
-        },
-        _ => {println!("Unrecognized command")},
+        }
+        _ => {
+            println!("Unrecognized command")
+        }
     }
 }
 
