@@ -2,6 +2,18 @@ use chrono::prelude::*;
 use clap::{Arg, Command, SubCommand};
 use std::io::prelude::*;
 use std::{fs, path};
+use tui::{
+    backend::CrosstermBackend,
+    Terminal,
+    widgets::{Widget, Block, Borders},
+    layout::{Layout, Constraint, Direction},
+    Frame,
+};
+use crossterm::{
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
 
 fn main() {
     let app = Command::new("Notation")
@@ -113,5 +125,38 @@ fn new_note(time: DateTime<Local>) -> Result<fs::File, std::io::Error> {
 
 fn rm_note(loc: String) -> Result<(), std::io::Error> {
     fs::remove_file(loc)?;
+    Ok(())
+}
+
+fn find_note_tui() -> Result<(), std::io::Error> {
+    enable_raw_mode()?;
+    let stdout = std::io::stdout();
+    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    terminal.draw(|f| {
+        let layout = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints(
+            [
+                Constraint::Percentage(90),
+                Constraint::Length(1),
+            ].as_ref()
+        )
+        .split(f.size());
+        let list = Block::default()
+            .title("Block")
+            .borders(Borders::ALL);
+        f.render_widget(list, layout[0]);
+            let input = Block::default()
+            .title("Block")
+            .borders(Borders::ALL);
+        f.render_widget(input, layout[1]);
+    })?;
+    std::thread::sleep(std::time::Duration::from_millis(5000));
+    disable_raw_mode()?;
+    execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
+    terminal.show_cursor()?;
     Ok(())
 }
