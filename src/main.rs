@@ -1,6 +1,6 @@
-use chrono::prelude::*;
+use chrono::prelude::{DateTime, Local};
 use clap::{Arg, Command, SubCommand};
-use std::io::prelude::*;
+use std::io::prelude::Write;
 use std::{fs, path};
 
 fn main() {
