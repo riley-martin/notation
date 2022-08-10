@@ -1,5 +1,6 @@
 use chrono::prelude::{DateTime, Local};
 use clap::{Arg, Command, SubCommand};
+use std::ffi::OsString;
 use std::io::prelude::Write;
 use std::{fs, path};
 
@@ -116,7 +117,8 @@ fn rm_note(loc: String) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn find_note(input: String) -> Result<String, std::io::Error> {
+fn find_note(input: String) -> Result<OsString, std::io::Error> {
+    // Get year
     print!("\x27[2J");
     println!("Select year note was written in");
     let mut paths = fs::read_dir("notes/")?;
@@ -126,7 +128,7 @@ fn find_note(input: String) -> Result<String, std::io::Error> {
     print!("In what year was the note created? Enter a number: ");
     let mut input = String::new();
     std::io::stdin().read_line(&mut input)?;
-    let selection = paths
+    let mut selection = format!("notes/{}", paths
         .nth(
             input
                 .trim()
@@ -134,6 +136,29 @@ fn find_note(input: String) -> Result<String, std::io::Error> {
                 .expect("Invalid input; enter a number in the list"),
         )
         .unwrap()
-        .expect("Invalid input; enter a number in the list");
-    Ok(String::from("ok"))
+        .expect("Invalid input; enter a number in the list")
+        .path().to_str().unwrap());
+
+    // Get month
+    print!("\x27[2J");
+    let mut paths = fs::read_dir(&selection)?;
+    for (index, path) in paths.by_ref().enumerate() {
+        println!("({})  {}", index, path.unwrap().path().display());
+    }
+    print!("In what month was the note created? Enter a number: ");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    selection = format!("{}/{}", &selection, paths
+        .nth(
+            input
+                .trim()
+                .parse::<usize>()
+                .expect("Invalid input; enter a number in the list"),
+        )
+        .unwrap()
+        .expect("Invalid input; enter a number in the list")
+        .path().to_str().unwrap());
+
+    // Return
+    Ok(OsString::from("/not/a/valid/path"))
 }
