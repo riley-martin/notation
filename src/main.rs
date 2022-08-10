@@ -115,3 +115,25 @@ fn rm_note(loc: String) -> Result<(), std::io::Error> {
     fs::remove_file(loc)?;
     Ok(())
 }
+
+fn find_note(input: String) -> Result<String, std::io::Error> {
+    print!("\x27[2J");
+    println!("Select year note was written in");
+    let mut paths = fs::read_dir("notes/")?;
+    for (index, path) in paths.by_ref().enumerate() {
+        println!("({})  {}", index, path.unwrap().path().display());
+    }
+    print!("In what year was the note created? Enter a number: ");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    let selection = paths
+        .nth(
+            input
+                .trim()
+                .parse::<usize>()
+                .expect("Invalid input; enter a number in the list"),
+        )
+        .unwrap()
+        .expect("Invalid input; enter a number in the list");
+    Ok(String::from("ok"))
+}
