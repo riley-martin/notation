@@ -102,15 +102,14 @@ fn new_note(time: DateTime<Local>) -> Result<fs::File, std::io::Error> {
     let path = path::Path::new(&pathfmt);
     let prefix = path.parent().unwrap();
     fs::create_dir_all(prefix).unwrap();
-    let result = if path.exists() {
+    if path.exists() {
         Err(std::io::Error::new(
             std::io::ErrorKind::AlreadyExists,
             "Note exists, perhaps try editing existing note?",
         ))
     } else {
         Ok(fs::File::create(&path)?)
-    };
-    result
+    }
 }
 
 fn rm_note(loc: String) -> Result<(), std::io::Error> {
@@ -140,8 +139,7 @@ fn find_directory(path: &str, name: &str) -> Result<String, std::io::Error> {
     std::io::stdout().flush()?;
     let mut input = String::new();
     std::io::stdin().read_line(&mut input)?;
-    let selection = format!(
-        "{}",
+    let selection = 
         fs::read_dir(path)?
             .nth(
                 input
@@ -156,7 +154,7 @@ fn find_directory(path: &str, name: &str) -> Result<String, std::io::Error> {
             .file_name()
             .to_str()
             .unwrap()
-    );
+            .to_string();
     Ok(selection)
 }
 
