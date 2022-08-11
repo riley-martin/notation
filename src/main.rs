@@ -1,5 +1,6 @@
 use chrono::prelude::{DateTime, Local};
 use clap::{Arg, Command, SubCommand};
+// use std::ffi::OsString;
 use std::io::prelude::Write;
 use std::{fs, path};
 
@@ -70,8 +71,9 @@ fn main() {
                     subcmd_matches
                         .get_one::<String>("note")
                         .expect("What note shall I edit")
+                        .clone()
                 } else {
-                    ""
+                    find_note().expect("couldn't find note")
                 })
                 .spawn()
                 .expect("Couln't execute $EDITOR");
@@ -108,10 +110,85 @@ fn new_note(time: DateTime<Local>) -> Result<fs::File, std::io::Error> {
     } else {
         Ok(fs::File::create(&path)?)
     };
-    return result;
+    result
 }
 
 fn rm_note(loc: String) -> Result<(), std::io::Error> {
     fs::remove_file(loc)?;
     Ok(())
+}
+
+fn find_note() -> Result<String, std::io::Error> {
+    let mut selection: String = "notes".into();
+    for word in ["year", "month", "day"] {
+        selection = format!("{selection}/{}", find_directory(&*selection, word)?);
+    }
+    selection = format!("{selection}/{}", find_file(&*selection)?);
+    Ok(selection)
+}
+
+fn find_directory(path: &str, name: &str) -> Result<String, std::io::Error> {
+    // Get year
+    print!("\x1b[2J");
+    println!("Select {name} note was written in");
+    let mut paths = fs::read_dir(path)?;
+    // let a = paths.clone();
+    for (index, path) in paths.by_ref().enumerate() {
+        println!("({})  {}", index, path?.file_name().to_str().unwrap());
+    }
+    print!("In what {name} was the note created? Enter a number: ");
+    std::io::stdout().flush()?;
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    let selection = format!(
+        "{}",
+        fs::read_dir(path)?
+            .nth(
+                input
+                    .trim()
+                    .parse::<usize>()
+                    .expect("Invalid input; enter a number in the list"),
+            )
+            .unwrap_or_else(|| {
+                panic!("path.nth({input}) == None");
+            })
+            .expect("Invalid input; enter a number in the list")
+            .file_name()
+            .to_str()
+            .unwrap()
+    );
+    Ok(selection)
+}
+
+fn find_file(path: &str) -> Result<String, std::io::Error> {
+    // TODO: Use title instead of filename
+    print!("\x1b[2J");
+    println!("Select note");
+    let mut paths = fs::read_dir(path)?;
+    // let a = paths.clone();
+    for (index, path) in paths.by_ref().enumerate() {
+        println!("({})  {}", index, path?.file_name().to_str().unwrap());
+    }
+    print!("What note should I edit? Enter a number: ");
+    std::io::stdout().flush()?;
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    let selection = format!(
+        "{}",
+        fs::read_dir(path)?
+            .nth(
+                input
+                    .trim()
+                    .parse::<usize>()
+                    .expect("Invalid input; enter a number in the list"),
+            )
+            .unwrap_or_else(|| {
+                panic!("path.nth({input}) == None");
+            })
+            .expect("Invalid input; enter a number in the list")
+            .file_name()
+            .to_str()
+            .unwrap()
+    );
+    Ok(selection)
 }
